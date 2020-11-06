@@ -170,6 +170,12 @@ function showScore() {
   var text = '我为长者续命 %s 秒\n志己的生命减少 %s 秒\n而且这个效率efficiency: %s%\n\n最吼的一次续了 %s 秒';
 
   var score = global.score;
+  var settings = global.settings;
+  if (settings.uid != undefined && settings.mid != undefined) {
+    var xhr = new XMLHttpRequest;
+    xhr.open("GET", "/sendScore?game=FlappyFrog&score=" + score + "&uid=" + settings.uid + "&mid=" + settings.mid);
+    xhr.send();
+  }
   var timeElapsed = global.timeElapsed;
   var a = Math.floor(score / timeElapsed * 100);
   a = text.replace('%s', score).replace('%s', timeElapsed).replace('%s', a).replace('%s', global.bestScore);

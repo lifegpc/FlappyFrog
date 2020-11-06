@@ -72,4 +72,30 @@ exports.loadSettingsFromUrl = function() {
   }
 };
 
+exports.loadHighScores = function () {
+  var settings = global.settings;
+  if (settings.uid != undefined && settings.mid != undefined) {
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", "/getGameHighScores?game=FlappyFrog&mid=" + settings.mid + "&uid=" + settings.uid);
+    xhr.responseType = "json";
+    xhr.onload = function(e) {
+      /**@typedef {{first_name: string, id: number, is_bot: boolean, last_name: string, username: string, language_code: string}} TgUser
+       * @typedef {{position: number, score: number, user: TgUser}} TgScore
+       * @typedef {{ok: boolean, result: Array<TgScore>}} TgHighScore
+       */
+      /**@type {TgHighScore}*/
+      var j = xhr.response;
+      if (j.ok) {
+        global.TgHighScore = j.result;
+        j.result.forEach(function(e) {
+          if (e.user.id == settings.uid) {
+            global.bestScore = e.score;
+          }
+        })
+      }
+    }
+    xhr.send();
+  }
+}
+
 });

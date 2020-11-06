@@ -2,7 +2,8 @@ require.register('game.js', function(exports, require, module) {
 'use strict';
 
 var global = require('global');
-var preloadImage = require('utils').preloadImage;
+var utils = require('utils');
+var preloadImage = utils.preloadImage;
 var sounds = require('sounds');
 var pipes = require('pipes');
 var clouds = require('clouds');
@@ -206,6 +207,7 @@ function stop() {
 }
 
 exports.start = function(cb) {
+  utils.loadHighScores();
   startTime = global.phaserGame.time.now;
 
   sounds('hurt').stop();
