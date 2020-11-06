@@ -109,18 +109,20 @@ exports.moreEndInfo = function() {
   var text3 = '';
   /**@type {Array<TgScore>}*/
   var hs = global.TgHighScore;
-  var mx = 0;
+  var px = 0;
+  var has = false;
   hs.forEach(function(e) {
     var un = e.user.first_name;
     if (e.user.last_name != undefined) un += (" " + e.user.last_name);
     text3 += ('\n%s.%s %s'.replace('%s', e.position).replace('%s', un).replace('%s', e.score));
-    if (e.score > mx) mx = e.score;
     if (e.user.id == settings.uid) {
-      text2 = e.position > 1 ? text2.replace('%s', mx - global.score).replace('%s', mx - e.score) : '';
+      text2 = e.position > 1 ? text2.replace('%s', px - global.score).replace('%s', px - e.score) : '';
       text = text.replace('%s', e.position).replace('%s', text2);
+      has = true;
     }
+    px = e.score;
   })
-  return text + text3;
+  return has? text + text3 : '\n' + text3;
 }
 
 });
