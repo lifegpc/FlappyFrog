@@ -207,7 +207,6 @@ function stop() {
 }
 
 exports.start = function(cb) {
-  utils.loadHighScores();
   startTime = global.phaserGame.time.now;
 
   sounds('hurt').stop();

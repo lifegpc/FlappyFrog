@@ -171,14 +171,19 @@ function showScore() {
 
   var score = global.score;
   var settings = global.settings;
-  if (settings.uid != undefined && settings.mid != undefined) {
-    var xhr = new XMLHttpRequest;
-    xhr.open("GET", "/sendScore?game=FlappyFrog&score=" + score + "&uid=" + settings.uid + "&mid=" + settings.mid);
-    xhr.send();
-  }
   var timeElapsed = global.timeElapsed;
   var a = Math.floor(score / timeElapsed * 100);
   a = text.replace('%s', score).replace('%s', timeElapsed).replace('%s', a).replace('%s', global.bestScore);
+  if (settings.uid != undefined && settings.mid != undefined) {
+    var xhr = new XMLHttpRequest;
+    xhr.open("GET", "/sendScore?game=FlappyFrog&score=" + score + "&uid=" + settings.uid + "&mid=" + settings.mid, true);
+    xhr.onload = () => {utils.loadHighScores(() => {
+      var a = Math.floor(score / timeElapsed * 100);
+      a = text.replace('%s', score).replace('%s', timeElapsed).replace('%s', a).replace('%s', global.bestScore) + utils.moreEndInfo();
+      scoreText.setText(a);
+    });};
+    xhr.send();
+  }
 
   scoreText.setText(a);
   scoreText.visible = true;

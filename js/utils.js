@@ -72,30 +72,55 @@ exports.loadSettingsFromUrl = function() {
   }
 };
 
-exports.loadHighScores = function () {
+/**@typedef {{first_name: string, id: number, is_bot: boolean, last_name: string, username: string, language_code: string}} TgUser
+ * @typedef {{position: number, score: number, user: TgUser}} TgScore
+ * @typedef {{ok: boolean, result: Array<TgScore>}} TgHighScore
+ */
+/**@type {(e: ()=>void)=>void}*/
+exports.loadHighScores = function (f) {
   var settings = global.settings;
   if (settings.uid != undefined && settings.mid != undefined) {
     var xhr = new XMLHttpRequest();
-    xhr.open("GET", "/getGameHighScores?game=FlappyFrog&mid=" + settings.mid + "&uid=" + settings.uid);
+    xhr.open("GET", "/getGameHighScores?game=FlappyFrog&mid=" + settings.mid + "&uid=" + settings.uid, true);
     xhr.responseType = "json";
     xhr.onload = function(e) {
-      /**@typedef {{first_name: string, id: number, is_bot: boolean, last_name: string, username: string, language_code: string}} TgUser
-       * @typedef {{position: number, score: number, user: TgUser}} TgScore
-       * @typedef {{ok: boolean, result: Array<TgScore>}} TgHighScore
-       */
       /**@type {TgHighScore}*/
       var j = xhr.response;
       if (j.ok) {
         global.TgHighScore = j.result;
-        j.result.forEach(function(e) {
+        for (var i = 0; i < j.result.length; i ++)
+        {
+          var e = j.result[i];
           if (e.user.id == settings.uid) {
             global.bestScore = e.score;
           }
-        })
+        }
+        f();
       }
     }
     xhr.send();
   }
+}
+
+exports.moreEndInfo = function() {
+  var settings = global.settings;
+  var text = '\n\n目前排名第 %s 名%s\n';
+  var text2 = '，距离前一名玩家还差 %s(%s) 秒';
+  var text3 = '';
+  /**@type {Array<TgScore>}*/
+  var hs = global.TgHighScore;
+  var mx = 0;
+  hs.forEach(function(e) {
+    var un = e.user.first_name;
+    if (e.user.last_name != undefined) un += (" " + e.user.last_name);
+    text3 += ('\n%s.%s %s'.replace('%s', e.position).replace('%s', un).replace('%s', e.score));
+    if (e.score > mx) mx = e.score;
+    if (e.user.id == settings.uid) {
+      text2 = e.position > 1 ? text2.replace('%s', mx - global.score).replace('%s', mx - e.score) : '';
+      text = text.replace('%s', e.position).replace('%s', text2);
+    }
+  })
+  return text + text3;
 }
 
 });
