@@ -183,6 +183,7 @@ function showScore() {
       scoreText.setText(a);
     });};
     xhr.send();
+    a += "\n\n正在上传分数并更新排行榜......";
   }
 
   scoreText.setText(a);
