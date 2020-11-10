@@ -111,16 +111,37 @@ exports.moreEndInfo = function() {
   var hs = global.TgHighScore;
   var px = 0;
   var has = false;
+  var mypos = 1;
+  var fp = hs.length ? hs[0].position : -1;
   hs.forEach(function(e) {
-    var un = e.user.first_name;
-    if (e.user.last_name != undefined) un += (" " + e.user.last_name);
-    text3 += ('\n%s.%s %s'.replace('%s', e.position).replace('%s', un).replace('%s', e.score));
     if (e.user.id == settings.uid) {
       text2 = e.position > 1 ? text2.replace('%s', px - global.score).replace('%s', px - e.score) : '';
       text = text.replace('%s', e.position).replace('%s', text2);
+      mypos = e.position;
       has = true;
     }
     px = e.score;
+  })
+  var hsl = hs;
+  if (hs.length > 5) {
+    var f = 0;
+    var l = hs.length;
+    f = mypos - fp - 2;
+    l = mypos - fp + 3;
+    if (f < 0) {
+      f = 0;
+      l = 5;
+    }
+    else if (l > hs.length) {
+      f = hs.length - 5;
+      l = hs.length;
+    }
+    hsl = hs.slice(f, l);
+  }
+  hsl.forEach((e) => {
+    var un = e.user.first_name;
+    if (e.user.last_name != undefined) un += (" " + e.user.last_name);
+    text3 += ('\n%s.%s %s'.replace('%s', e.position).replace('%s', un).replace('%s', e.score));
   })
   return has? text + text3 : '\n' + text3;
 }
